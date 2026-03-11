@@ -1,337 +1,303 @@
-import { Box, Button, Flex, Heading, Image, Text, useMediaQuery } from '@chakra-ui/react'
 import React, { useContext } from 'react'
-import Context from '../../context/CartContext'
 import {
-    Table,
-    Thead,
-    Tbody,
-    Tfoot,
-    Tr,
-    Th,
-    Td,
-    TableContainer,
-  } from '@chakra-ui/react'
-import { TiDeleteOutline } from "react-icons/ti";
-import { Link } from 'react-router-dom';
+  Box, Button, Flex, Heading, Image, Text,
+  useMediaQuery, useColorModeValue, Divider
+} from '@chakra-ui/react'
+import Context from '../../context/CartContext'
+import { TiDeleteOutline } from 'react-icons/ti'
+import { Link } from 'react-router-dom'
+import { BsCart3 } from 'react-icons/bs'
 
+const QtyControl = ({ onDecrement, onIncrement, quantity }) => (
+  <Flex align="center" gap={2}>
+    <Button
+      onClick={onDecrement}
+      w="28px" h="28px" minW="28px" p={0}
+      bg="transparent"
+      border="1px solid rgba(255,82,0,0.35)"
+      color="#FF5200"
+      fontSize="15px" fontWeight="700"
+      borderRadius="5px"
+      _hover={{ bg: 'rgba(255,82,0,0.1)', borderColor: '#FF5200' }}
+      _active={{ transform: 'scale(0.9)' }}
+    >−</Button>
+    <Text fontFamily="'Bebas Neue', sans-serif" fontSize="20px" minW="24px" textAlign="center">
+      {quantity}
+    </Text>
+    <Button
+      onClick={onIncrement}
+      w="28px" h="28px" minW="28px" p={0}
+      bg="transparent"
+      border="1px solid rgba(255,82,0,0.35)"
+      color="#FF5200"
+      fontSize="15px" fontWeight="700"
+      borderRadius="5px"
+      _hover={{ bg: 'rgba(255,82,0,0.1)', borderColor: '#FF5200' }}
+      _active={{ transform: 'scale(0.9)' }}
+    >+</Button>
+  </Flex>
+)
 
 const Cart = () => {
+  const { cart, removeItem, clearCart, getTotal, incrementarItem, decrementarItem } = useContext(Context)
+  const [isMobile] = useMediaQuery('(max-width: 768px)')
 
-    const { cart, removeItem, clearCart, getTotal, incrementarItem, decrementarItem } = useContext(Context)
-    const [ isMobile ] = useMediaQuery('(max-width: 768px)')
-    
-    if (cart.length === 0) {
-        return (
-            <Flex justify={'center'} direction={'column'} align={'center'} h={'85vh'}>
-                <Text fontSize="45px" color="gray.600" mb={6}>
-                    Todavía no agregaste productos al carrito.
-                </Text>
-                <Link to="/">
-                    <Button 
-                        fontSize={'30px'}
-                        fontWeight={'400'} 
-                        backgroundColor='#FF6F00' 
-                        p={6}
-                        boxShadow={'2px 2px 6px #777'}
-                        textShadow={'1px 1.5px 3px #FFF'}
-                        _active={{transform: 'scale(.9)'}}
-                        _hover={{backgroundColor:'#FFD1AD'}}  
-                    >
-                        Ver productos
-                    </Button>
-                </Link>
-            </Flex>
-        )
-    } else if(isMobile) {
-        return (
-            <Flex direction="column" p={4}>
-                <Heading 
-                    align={'center'} 
-                    fontFamily={'Permanent Marker'}
-                    fontSize={'18px'}
-                    textShadow={'1.5px 1.5px 2px #777, 4px 4px 3px #ccc'}
-                    mb={4}
-                >
-                    CARRITO DE COMPRAS
-                </Heading>
-                {cart.map((prod) => (
-                    <Flex key={prod.id} mb={4} p={2} borderRadius="md" boxShadow="md">
-                        <Flex w={'100%'} mr={2} justify={'space-between'} alignItems={'center'}>
-                            <Button 
-                                onClick={() => removeItem(prod.id)} 
-                                backgroundColor={'transparent'}
-                                _hover={'none'}
-                            >
-                                <TiDeleteOutline
-                                    size="40px" 
-                                    cursor="pointer" 
-                                    color="red"
-                                />
-                            </Button>
-                            <Flex direction={'column'} alignItems={'center'}>
-                                <Image 
-                                    src={prod.img}
-                                    alt={`${prod.marca} ${prod.modelo}`}
-                                    borderRadius='md'
-                                    objectFit='contain'
-                                    boxSize='100px'
-                                    mr={4}
-                                />
-                                <Text fontSize={'16px'} fontWeight={'700'}>{prod.marca}</Text>
-                                <Text fontSize={'14px'} fontWeight={'500'}>{prod.modelo}</Text>
-                            </Flex>
-                            <Flex direction={'column'} gap={1}>
-                                <Text fontSize={'16px'} fontWeight={'500'}>Talle: {prod.talle}</Text>
-                                <Text fontSize={'16px'} fontWeight={'500'}>Precio: ${prod.precio}</Text>
-                                <Flex justify={'center'}>
-                                    <Button 
-                                        onClick={() => decrementarItem(prod.id)} 
-                                        backgroundColor='#FF6F00' 
-                                        marginRight={'5px'} 
-                                        padding={'2px'}
-                                        fontSize={'14px'}
-                                        fontWeight={'bolder'}
-                                        height={'30px'} 
-                                        boxShadow={'2px 2px 6px #777'}
-                                        textShadow={'1px 1.5px 3px #FFF'}
-                                        _hover={{backgroundColor: '#FFD1AD'}}
-                                        _active={{transform: 'scale(.9)'}}
-                                    >
-                                        -
-                                    </Button>
-                                    <Text fontSize={'16px'} fontWeight={'500'}>{prod.quantity}</Text>
-                                    <Button 
-                                        onClick={() => incrementarItem(prod.id, prod.stock)} 
-                                        backgroundColor='#FF6F00' 
-                                        marginLeft={'5px'}
-                                        padding={'2px'}
-                                        fontSize={'14px'}
-                                        fontWeight={'bolder'}
-                                        height={'30px'} 
-                                        boxShadow={'2px 2px 6px #777'}
-                                        textShadow={'1px 1.5px 3px #FFF'}
-                                        _hover={{backgroundColor: '#FFD1AD'}}
-                                        _active={{transform: 'scale(.9)'}}
-                                    >
-                                        +
-                                    </Button>
-                                </Flex>
-                                <Text fontSize={'16px'} fontWeight={'500'}>Subtotal: ${prod.precio * prod.quantity}</Text>
-                            </Flex>
-                        </Flex>
-                    </Flex>
-                ))}
-                <Flex justify="space-between" alignItems={'center'} mt={1}>
-                    <Flex>
-                        <Button 
-                            onClick={() => clearCart()}
-                            fontSize={'14px'}
-                            fontWeight={'500'} 
-                            backgroundColor='#FF6F00' 
-                            p={4}
-                            boxShadow={'2px 2px 6px #777'}
-                            textShadow={'1px 1.5px 3px #FFF'}
-                            _active={{transform: 'scale(.9)'}}
-                            _hover={{backgroundColor:'#FFD1AD'}} 
-                        >
-                            Vaciar Carrito
-                        </Button>
-                    </Flex>
-                    <Text fontSize={'18px'} fontWeight={'600'}>
-                        Total del Carrito: <Text as="span" fontSize={'20px'} fontWeight={'bold'}>${getTotal()}</Text>
+  const pageBg = useColorModeValue('#F4F3EF', '#0A0A10')
+  const cardBg = useColorModeValue('white', '#13131C')
+  const borderColor = useColorModeValue('rgba(0,0,0,0.07)', 'rgba(255,82,0,0.12)')
+  const textMuted = useColorModeValue('#888', '#666')
+  const labelColor = useColorModeValue('#999', '#555')
+
+  if (cart.length === 0) {
+    return (
+      <Flex
+        bg={pageBg}
+        minH="calc(100vh - 68px)"
+        direction="column"
+        justify="center"
+        align="center"
+        gap={6}
+        className="court-pattern"
+      >
+        <BsCart3 size={64} color={labelColor} />
+        <Box textAlign="center">
+          <Text
+            fontFamily="'Bebas Neue', sans-serif"
+            fontSize={{ base: '28px', md: '36px' }}
+            letterSpacing="0.05em"
+            mb={1}
+          >
+            Tu carrito está vacío
+          </Text>
+          <Text fontSize="14px" color={textMuted} fontWeight="400">
+            Agregá productos para comenzar
+          </Text>
+        </Box>
+        <Link to="/">
+          <Button
+            h="44px"
+            px={8}
+            bg="#FF5200"
+            color="white"
+            fontFamily="'Outfit', sans-serif"
+            fontWeight="700"
+            fontSize="13px"
+            letterSpacing="0.1em"
+            textTransform="uppercase"
+            borderRadius="6px"
+            boxShadow="0 4px 16px rgba(255,82,0,0.35)"
+            _hover={{ bg: '#FF7A3D', transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(255,82,0,0.45)' }}
+            _active={{ bg: '#CC4200', transform: 'scale(0.97)' }}
+            transition="all 0.2s ease"
+          >
+            Ver productos
+          </Button>
+        </Link>
+      </Flex>
+    )
+  }
+
+  return (
+    <Box bg={pageBg} minH="calc(100vh - 68px)" py={6} px={{ base: 4, md: 8 }} className="court-pattern">
+      {/* Header */}
+      <Flex align="baseline" gap={3} mb={6}>
+        <Text
+          fontFamily="'Bebas Neue', sans-serif"
+          fontSize={{ base: '28px', md: '38px' }}
+          letterSpacing="0.06em"
+          lineHeight="1"
+        >
+          Carrito
+        </Text>
+        <Text fontSize="13px" color={textMuted} fontWeight="500">
+          {cart.length} {cart.length === 1 ? 'producto' : 'productos'}
+        </Text>
+      </Flex>
+
+      <Flex
+        direction={{ base: 'column', lg: 'row' }}
+        gap={5}
+        align={{ base: 'stretch', lg: 'flex-start' }}
+      >
+        {/* Cart items */}
+        <Box flex={1}>
+          <Flex direction="column" gap={3}>
+            {cart.map((prod) => (
+              <Box
+                key={prod.id}
+                bg={cardBg}
+                border={`1px solid ${borderColor}`}
+                borderRadius="10px"
+                p={{ base: 3, md: 4 }}
+                transition="border-color 0.2s ease"
+                _hover={{ borderColor: 'rgba(255,82,0,0.3)' }}
+              >
+                <Flex gap={4} align="center">
+                  {/* Remove */}
+                  <Button
+                    onClick={() => removeItem(prod.id)}
+                    variant="ghost"
+                    p={1}
+                    h="auto"
+                    minW="auto"
+                    color="rgba(255,60,60,0.7)"
+                    _hover={{ color: '#FF3333', bg: 'rgba(255,0,0,0.07)' }}
+                    borderRadius="5px"
+                    flexShrink={0}
+                  >
+                    <TiDeleteOutline size={22} />
+                  </Button>
+
+                  {/* Image */}
+                  <Box
+                    bg={useColorModeValue('rgba(0,0,0,0.03)', 'rgba(255,255,255,0.03)')}
+                    borderRadius="7px"
+                    p={2}
+                    flexShrink={0}
+                  >
+                    <Image
+                      src={prod.img}
+                      alt={`${prod.marca} ${prod.modelo}`}
+                      objectFit="contain"
+                      boxSize={{ base: '70px', md: '90px' }}
+                    />
+                  </Box>
+
+                  {/* Info */}
+                  <Box flex={1} minW={0}>
+                    <Text fontWeight="700" fontSize={{ base: '14px', md: '16px' }} noOfLines={1}>
+                      {prod.marca}
                     </Text>
+                    <Text fontWeight="400" fontSize="13px" color={textMuted} noOfLines={1}>
+                      {prod.modelo}
+                    </Text>
+                    <Text fontSize="12px" color={labelColor} mt={0.5}>
+                      Talle {prod.talle}
+                    </Text>
+                  </Box>
+
+                  {/* Right: qty + price */}
+                  <Flex
+                    direction="column"
+                    align="flex-end"
+                    gap={2}
+                    flexShrink={0}
+                  >
+                    <Text
+                      fontFamily="'Bebas Neue', sans-serif"
+                      fontSize="20px"
+                      color="#FF5200"
+                      letterSpacing="0.03em"
+                    >
+                      ${(prod.precio * prod.quantity).toLocaleString('es-ES')}
+                    </Text>
+                    <QtyControl
+                      quantity={prod.quantity}
+                      onDecrement={() => decrementarItem(prod.id)}
+                      onIncrement={() => incrementarItem(prod.id, prod.stock)}
+                    />
+                    <Text fontSize="11px" color={labelColor}>
+                      ${prod.precio.toLocaleString('es-ES')} c/u
+                    </Text>
+                  </Flex>
                 </Flex>
-                <Flex justify={'end'}>
-                        <Link to='/checkout'>
-                            <Button
-                                fontSize={'14px'}
-                                fontWeight={'500'} 
-                                backgroundColor='#FF6F00' 
-                                p={4}
-                                boxShadow={'2px 2px 6px #777'}
-                                textShadow={'1px 1.5px 3px #FFF'}
-                                _active={{transform: 'scale(.9)'}}
-                                _hover={{backgroundColor:'#FFD1AD'}}  
-                            >
-                                Finalizar Compra
-                            </Button>
-                        </Link>
-                    </Flex>
-            </Flex>
-        );
-    } else {
-        return (
-            <TableContainer>
-                <Heading 
-                    align={'center'} 
-                    m={'3'}
-                    fontFamily={'Permanent Marker'}
-                    fontSize={'25px'}
-                    textShadow={'1.5px 1.5px 2px #777, 4px 4px 3px #ccc'}
-                >
-                    CARRITO DE COMPRAS
-                </Heading>
-                <Table>
-                    <Thead>
-                        <Tr>
-                            <Th fontSize={'15px'}>Producto</Th>
-                            <Th textAlign={'center'} fontSize={'15px'}>Talle</Th>
-                            <Th textAlign={'center'} fontSize={'15px'}>Precio</Th>
-                            <Th textAlign={'center'} fontSize={'15px'}>Cantidad</Th>
-                            <Th textAlign={'center'} fontSize={'15px'}>Subtotal</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {
-                            cart.map((prod) => (
-                                <Tr key={prod.id}>
-                                    <Td>
-                                        <Flex justify={'left'} align={'center'} gap={'55px'}>
-                                            <Button 
-                                                onClick={() => removeItem(prod.id)} 
-                                                backgroundColor={'transparent'}
-                                                _hover={'none'}
-                                            >
-                                                <TiDeleteOutline
-                                                    size="35px" 
-                                                    cursor="pointer" 
-                                                    color="red"
-                                                />
-                                            </Button>
-                                            <Image 
-                                                src={prod.img}
-                                                alt={`${prod.marca} ${prod.modelo}`}
-                                                borderRadius='md'
-                                                objectFit='contain'
-                                                boxSize='130px'
-                                            />
-                                            <Flex direction={'column'}>
-                                                <Box 
-                                                    fontSize={'20px'}
-                                                    fontWeight={'700'}
-                                                >
-                                                    {prod.marca}
-                                                </Box> 
-                                                <Box
-                                                    fontSize={'18px'}
-                                                    fontWeight={'500'}
-                                                >
-                                                    {prod.modelo}
-                                                </Box>
-                                            </Flex>
-                                        </Flex>
-                                    </Td>
-                                    <Td 
-                                        textAlign={'center'}
-                                        fontSize={'18px'}
-                                        fontWeight={'500'}
-                                    >
-                                        {prod.talle}
-                                    </Td>
-                                    <Td 
-                                        textAlign={'center'}
-                                        fontSize={'18px'}
-                                        fontWeight={'500'}
-                                    >
-                                        ${prod.precio}
-                                    </Td>
-                                    <Td 
-                                        textAlign={'center'}
-                                        fontSize={'18px'}
-                                        fontWeight={'500'}
-                                    >
-                                        <Button 
-                                            onClick={() => decrementarItem(prod.id)} 
-                                            backgroundColor='#FF6F00' 
-                                            marginRight={'3px'} 
-                                            padding={'2px'}
-                                            fontSize={'16px'}
-                                            fontWeight={'bolder'}
-                                            height={'30px'} 
-                                            boxShadow={'2px 2px 6px #777'}
-                                            textShadow={'1px 1.5px 3px #FFF'}
-                                            _hover={{backgroundColor: '#FFD1AD'}}
-                                            _active={{transform: 'scale(.9)'}}
-                                        >
-                                            -
-                                        </Button>
-                                        {prod.quantity}
-                                        <Button 
-                                            onClick={() => incrementarItem(prod.id, prod.stock)} 
-                                            backgroundColor='#FF6F00' 
-                                            marginLeft={'6px'}
-                                            padding={'3px'}
-                                            fontSize={'16px'}
-                                            fontWeight={'bolder'}
-                                            height={'30px'} 
-                                            boxShadow={'2px 2px 6px #777'}
-                                            textShadow={'1px 1.5px 3px #FFF'}
-                                            _hover={{backgroundColor: '#FFD1AD'}}
-                                            _active={{transform: 'scale(.9)'}}
-                                        >
-                                            +
-                                        </Button>
-                                    </Td>
-                                    <Td 
-                                        textAlign={'center'}
-                                        fontSize={'18px'}
-                                        fontWeight={'500'}
-                                    >
-                                        ${prod.precio * prod.quantity}
-                                    </Td>
-                                </Tr>
-                            ))     
-                        }
-                    </Tbody>
-                    <Tfoot>
-                        <Tr>
-                            <Th>
-                                <Button 
-                                    onClick={() => clearCart()}
-                                    fontSize={'20px'}
-                                    fontWeight={'500'} 
-                                    backgroundColor='#FF6F00' 
-                                    p={4}
-                                    boxShadow={'2px 2px 6px #777'}
-                                    textShadow={'1px 1.5px 3px #FFF'}
-                                    _active={{transform: 'scale(.9)'}}
-                                    _hover={{backgroundColor:'#FFD1AD'}} 
-                                >
-                                    Vaciar Carrito
-                                </Button>
-                            </Th>
-                            <Th></Th>
-                            <Th colSpan={2} fontSize={'18px'}>Total del carrito</Th>
-                            <Th textAlign={'center'} fontSize={'20px'}>${getTotal()}</Th>
-                        </Tr>
-                        <Tr>
-                            <Th></Th>
-                            <Th colSpan={2}></Th>
-                            <Th textAlign={'center'}>
-                                <Link to='/checkout'>
-                                    <Button
-                                        w={'80%'}
-                                        fontSize={'20px'}
-                                        fontWeight={'500'} 
-                                        backgroundColor='#FF6F00' 
-                                        p={4}
-                                        boxShadow={'2px 2px 6px #777'}
-                                        textShadow={'1px 1.5px 3px #FFF'}
-                                        _active={{transform: 'scale(.9)'}}
-                                        _hover={{backgroundColor:'#FFD1AD'}}  
-                                        >
-                                        Finalizar Compra
-                                    </Button>
-                                </Link>
-                            </Th>
-                        </Tr>
-                    </Tfoot>
-                </Table>
-            </TableContainer>
-        )
-    }
+              </Box>
+            ))}
+          </Flex>
 
+          {/* Clear cart */}
+          <Flex justify="flex-start" mt={4}>
+            <Button
+              onClick={clearCart}
+              variant="ghost"
+              fontSize="12px"
+              fontWeight="600"
+              letterSpacing="0.08em"
+              textTransform="uppercase"
+              color={textMuted}
+              h="36px"
+              px={4}
+              borderRadius="5px"
+              border={`1px solid ${borderColor}`}
+              _hover={{ color: '#FF3333', borderColor: 'rgba(255,0,0,0.3)', bg: 'rgba(255,0,0,0.05)' }}
+            >
+              Vaciar carrito
+            </Button>
+          </Flex>
+        </Box>
 
+        {/* Summary */}
+        <Box
+          w={{ base: '100%', lg: '320px' }}
+          bg={cardBg}
+          border={`1px solid ${borderColor}`}
+          borderRadius="10px"
+          p={5}
+          position={{ base: 'static', lg: 'sticky' }}
+          top="100px"
+        >
+          <Text
+            fontFamily="'Bebas Neue', sans-serif"
+            fontSize="22px"
+            letterSpacing="0.06em"
+            mb={4}
+          >
+            Resumen
+          </Text>
+
+          <Flex direction="column" gap={2} mb={4}>
+            {cart.map((prod) => (
+              <Flex key={prod.id} justify="space-between" align="center">
+                <Text fontSize="13px" color={textMuted} noOfLines={1} flex={1} mr={2}>
+                  {prod.marca} {prod.modelo} x{prod.quantity}
+                </Text>
+                <Text fontSize="13px" fontWeight="600" flexShrink={0}>
+                  ${(prod.precio * prod.quantity).toLocaleString('es-ES')}
+                </Text>
+              </Flex>
+            ))}
+          </Flex>
+
+          <Divider borderColor={borderColor} mb={4} />
+
+          <Flex justify="space-between" align="center" mb={5}>
+            <Text fontWeight="700" fontSize="14px" textTransform="uppercase" letterSpacing="0.06em">
+              Total
+            </Text>
+            <Text
+              fontFamily="'Bebas Neue', sans-serif"
+              fontSize="28px"
+              color="#FF5200"
+              letterSpacing="0.03em"
+            >
+              ${getTotal().toLocaleString('es-ES')}
+            </Text>
+          </Flex>
+
+          <Link to="/checkout">
+            <Button
+              w="100%"
+              h="46px"
+              bg="#FF5200"
+              color="white"
+              fontFamily="'Outfit', sans-serif"
+              fontWeight="700"
+              fontSize="13px"
+              letterSpacing="0.1em"
+              textTransform="uppercase"
+              borderRadius="6px"
+              boxShadow="0 4px 16px rgba(255,82,0,0.3)"
+              _hover={{ bg: '#FF7A3D', boxShadow: '0 8px 24px rgba(255,82,0,0.45)', transform: 'translateY(-1px)' }}
+              _active={{ bg: '#CC4200', transform: 'scale(0.97)' }}
+              transition="all 0.2s ease"
+            >
+              Finalizar compra
+            </Button>
+          </Link>
+        </Box>
+      </Flex>
+    </Box>
+  )
 }
 
 export default Cart
